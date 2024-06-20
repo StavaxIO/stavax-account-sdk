@@ -3,3 +3,5 @@ node_modules
 es
 dist
 *.log
+.idea
+.yarn
