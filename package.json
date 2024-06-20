@@ -13,7 +13,7 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/stavax/account-sdk.git"
+    "url": "git+https://github.com/StavaxIO/stavax-account-sdk.git"
   },
   "publishConfig": {
     "access": "public"
