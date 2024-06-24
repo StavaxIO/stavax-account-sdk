@@ -25,3 +25,9 @@ export interface Session {
     id: string
     data: SessionData
 }
+
+export enum TgBotScreen {
+    home = 'home',
+    deposit = 'deposit',
+    withdraw = 'withdraw'
+}

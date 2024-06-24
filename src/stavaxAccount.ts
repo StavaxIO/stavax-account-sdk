@@ -1,5 +1,5 @@
 import axios, {AxiosInstance} from "axios";
-import {Session, SessionData, StavaxAccountConfig} from "./types";
+import {Session, SessionData, StavaxAccountConfig, TgBotScreen} from "./types";
 import {connect, getConnectors} from "@wagmi/core";
 import {isTelegram, isTelegramMobile, openTelegramLink} from "./telegram";
 import {Result} from "./result";
@@ -38,9 +38,9 @@ export class StavaxAccount {
                 walletConnectConnector?.emitter.off('message', onDisplayURI)
                 const session = await that.createSession({
                     uri: payload.data as string,
-                }).catch(() => undefined)
+                })
                 if (!session) {
-                    reject(new Error("cannot create stavax account session"))
+                    reject(new Error('cannot create stavax account session'))
                     return
                 }
 
@@ -51,7 +51,6 @@ export class StavaxAccount {
                         return
                     }
                 }
-
 
                 resolve(session)
             }
@@ -64,13 +63,18 @@ export class StavaxAccount {
     }
 
     async createSession(data?: SessionData): Promise<Session | undefined> {
-        const res = await this.api.post<{ data: Session }>(
-            '/wallet-sessions/new', {
-                project_id: this.config.projectID,
-                data: data || {}
-            },
-        )
-        return res.data.data
+        try {
+            const res = await this.api.post<{ data: Session }>(
+                '/wallet-sessions/new', {
+                    project_id: this.config.projectID,
+                    data: data || {}
+                },
+            )
+            return res.data?.data
+        } catch (err) {
+            console.error(err)
+            return undefined
+        }
     }
 
     openTgBot(session: Session): Result<void> {
@@ -85,9 +89,33 @@ export class StavaxAccount {
         return new Result(void 0)
     }
 
+    async openTgBotScreen(screen: TgBotScreen): Promise<Result<void>> {
+        let href: string = ''
+        switch (screen) {
+            case TgBotScreen.home:
+                href = '/'
+                break
+            case TgBotScreen.deposit:
+                href = '/currency/qr-code'
+                break
+            case TgBotScreen.withdraw:
+                href = '/withdraw'
+                break
+            default:
+                return new Result(void 0, new Error('invalid TgBotScreen'))
+        }
+
+        const session = await this.createSession({href})
+        if (!session) {
+            return new Result(void 0, new Error('cannot create new stavax session'))
+        }
+
+        return this.openTgBot(session)
+    }
+
     getTgBotWebAppURL(session: Session): Result<string> {
         if (!this.config.tgBotWebAppURL) {
-            return new Result("", new Error('missing tgBotWebAppURL config'))
+            return new Result('', new Error('missing tgBotWebAppURL config'))
         }
         const command = encodeURIComponent(`sid=${session.id}`);
         return new Result(`${this.config.tgBotWebAppURL}?startapp=${command}`)
