@@ -77,8 +77,8 @@ export class StavaxAccount {
         }
     }
 
-    openTgBot(session: Session): Result<void> {
-        if (isTelegram() && (isTelegramMobile() || this.config.openTgBotOnDesktop)) {
+    openTgBot(session: Session, force?: boolean): Result<void> {
+        if (force || (isTelegram() && (isTelegramMobile() || this.config.openTgBotOnDesktop))) {
             const result = this.getTgBotWebAppURL(session)
             if (result.error) {
                 return new Result(void 0, result.error)
@@ -89,7 +89,7 @@ export class StavaxAccount {
         return new Result(void 0)
     }
 
-    async openTgBotScreen(screen: TgBotScreen): Promise<Result<void>> {
+    async openTgBotScreen(screen: TgBotScreen, force?: boolean): Promise<Result<void>> {
         let href: string = ''
         switch (screen) {
             case TgBotScreen.home:
@@ -110,7 +110,7 @@ export class StavaxAccount {
             return new Result(void 0, new Error('cannot create new stavax session'))
         }
 
-        return this.openTgBot(session)
+        return this.openTgBot(session, force)
     }
 
     getTgBotWebAppURL(session: Session): Result<string> {

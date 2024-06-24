@@ -1,6 +1,6 @@
 {
   "name": "@stavaxio/account-sdk",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "files": [
     "lib",
     "es",
@@ -42,7 +42,8 @@
     "package": "echo '{ \"type\": \"commonjs\" }' > lib/package.json",
     "build": "yarn clean && node ./esBuild.js && tsc --emitDeclarationOnly -p tsconfig.json && yarn package",
     "dev:lib": "cross-env NODE_ENV=development concurrently \"tsc -w\" \"node ./esBuild.js\"",
-    "release:minor": "yarn version minor && yarn build"
+    "release:minor": "yarn version minor && yarn build",
+    "release:patch": "yarn version patch && yarn build"
   },
   "volta": {
     "node": "20.14.0",
