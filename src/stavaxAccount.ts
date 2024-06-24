@@ -1,12 +1,10 @@
 import axios, {AxiosInstance} from "axios";
 import {Session, SessionData, StavaxAccountConfig} from "./types";
 import {connect, getConnectors} from "@wagmi/core";
+import {isTelegram, isTelegramMobile, openTelegramLink} from "./telegram";
+import {Result} from "./result";
 
 const productionAPI = 'https://account-api.stavax.io'
-
-type ApiResponse<T> = {
-    data: T
-}
 
 export class StavaxAccount {
     private readonly api: AxiosInstance;
@@ -27,11 +25,17 @@ export class StavaxAccount {
         return new Promise((resolve, reject) => {
             const connectors = getConnectors(this.config.wagmiConfig)
 
+            const walletConnectConnector = connectors.find(c => c.id === 'walletConnect')
+            if (!walletConnectConnector) {
+                reject(new Error('missing walletConnect connector'))
+                return
+            }
+
             async function onDisplayURI(payload: any) {
                 if (payload.type != 'display_uri') {
                     return;
                 }
-                connectors[0].emitter.off('message', onDisplayURI)
+                walletConnectConnector?.emitter.off('message', onDisplayURI)
                 const session = await that.createSession({
                     uri: payload.data as string,
                 }).catch(() => undefined)
@@ -40,18 +44,27 @@ export class StavaxAccount {
                     return
                 }
 
+                if (!that.config.disableAutoOpenTgBot) {
+                    const result = that.openTgBot(session)
+                    if (result.error) {
+                        reject(result.error)
+                        return
+                    }
+                }
+
+
                 resolve(session)
             }
 
-            connectors[0].emitter.on('message', onDisplayURI)
+            walletConnectConnector.emitter.on('message', onDisplayURI)
             connect(this.config.wagmiConfig, {
-                connector: connectors[0]
+                connector: walletConnectConnector
             })
         })
     }
 
     async createSession(data?: SessionData): Promise<Session | undefined> {
-        const res = await this.api.post<ApiResponse<Session>>(
+        const res = await this.api.post<{ data: Session }>(
             '/wallet-sessions/new', {
                 project_id: this.config.projectID,
                 data: data || {}
@@ -60,11 +73,23 @@ export class StavaxAccount {
         return res.data.data
     }
 
-    getTelegramBotURL(session: Session) {
+    openTgBot(session: Session): Result<void> {
+        if (isTelegram() && (isTelegramMobile() || this.config.openTgBotOnDesktop)) {
+            const result = this.getTgBotWebAppURL(session)
+            if (result.error) {
+                return new Result(void 0, result.error)
+            }
+            openTelegramLink(result.value)
+        }
+
+        return new Result(void 0)
+    }
+
+    getTgBotWebAppURL(session: Session): Result<string> {
         if (!this.config.tgBotWebAppURL) {
-            return undefined
+            return new Result("", new Error('missing tgBotWebAppURL config'))
         }
         const command = encodeURIComponent(`sid=${session.id}`);
-        return `${this.config.tgBotWebAppURL}?startapp=${command}`
+        return new Result(`${this.config.tgBotWebAppURL}?startapp=${command}`)
     }
 }

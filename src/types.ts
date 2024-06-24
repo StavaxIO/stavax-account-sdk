@@ -4,12 +4,21 @@ export interface StavaxAccountConfig {
     projectID: string
     apiURL?: string
     tgBotWebAppURL?: string
+    disableAutoOpenTgBot?: boolean
+    openTgBotOnDesktop?: boolean
     requestTimeout?: number
     wagmiConfig: Config
 }
 
 export interface SessionData {
+    /**
+     * WalletConnect uri to pair with
+     */
     uri?: string
+    /**
+     * Path to target page
+     */
+    href?: string
 }
 
 export interface Session {
