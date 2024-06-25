@@ -54,6 +54,8 @@ By default, Stavax Account SDK will open Stavax Bot on Telegram Mobile.
 
 You can change this behavior by setting `disableAutoOpenTgBot` and `openTgBotOnDesktop` in the config object.
 
+Visit [wagmi](https://wagmi.sh) document for more details.
+
 ### Stavax Bot Interaction
 
 ```ts
@@ -64,8 +66,6 @@ stavaxAccount.openTgBotScreen(TgBotScreen.deposit)
 // Open bot with session, useful when need open bot manually when connect
 stavaxAccount.openTgBotWithSession(session)
 ```
-
-Visit [wagmi](https://wagmi.sh) document for more details.
 
 ### Config
 
