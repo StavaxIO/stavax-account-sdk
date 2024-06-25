@@ -12,7 +12,7 @@ export interface StavaxAccountConfig {
 
 export interface SessionData {
     /**
-     * WalletConnect uri to pair with
+     * WalletConnect uri to pair
      */
     uri?: string
     /**
