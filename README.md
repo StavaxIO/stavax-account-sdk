@@ -15,10 +15,10 @@ Stavax Account SDK depends on `wagmi` and `walletConnect`.
 ### Create a Stavax Account instance
 
 ```ts
-import {createConfig, http} from "wagmi"
-import {avalanche, avalancheFuji} from "wagmi/chains"
-import {walletConnect} from "@wagmi/connectors"
-import {StavaxAccount} from "@stavaxio/account-sdk"
+import { createConfig, http } from "@wagmi/core"
+import { avalanche, avalancheFuji } from "@wagmi/core/chains"
+import { walletConnect } from "@wagmi/connectors"
+import { StavaxAccount } from "@stavaxio/account-sdk"
 
 const stavaxAccount = new StavaxAccount({
     projectID: 'your-project-id',

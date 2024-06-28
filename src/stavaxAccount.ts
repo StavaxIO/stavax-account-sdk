@@ -1,8 +1,9 @@
-import axios, {AxiosInstance} from "axios";
-import {Session, SessionData, StavaxAccountConfig, TgBotScreen} from "./types";
+import axios, {type AxiosInstance} from "axios";
+import type {Session, SessionData, StavaxAccountConfig} from "./types.js";
+import {TgBotScreen} from "./types.js";
 import {connect, getConnectors} from "@wagmi/core";
-import {isTelegram, isTelegramMobile, openTelegramLink} from "./telegram";
-import {Result} from "./result";
+import {isTelegram, isTelegramMobile, openTelegramLink} from "./telegram.js";
+import {Result} from "./result.js";
 
 const productionAPI = 'https://account-api.stavax.io'
 const productionBotURL = 'https://t.me/stavax_account_bot/app'
@@ -110,7 +111,7 @@ export class StavaxAccount {
     }
 
     /**
-     * Asynchronously opens the Telegram bot screen with the specified screen and force options.
+     * Asynchronously opens the Telegram bot
      *
      * @param {boolean} [force] - Optional flag indicating whether to force opening the screen.
      * @return {Promise<Result<void>>} A promise that resolves with a Result object indicating the success or failure of the operation.
@@ -120,13 +121,26 @@ export class StavaxAccount {
     }
 
     /**
+     * Asynchronously opens the Telegram bot for interact
+     *
+     * @param {boolean} [force] - Optional flag indicating whether to force opening the screen.
+     * @return {Promise<Result<void>>} A promise that resolves with a Result object indicating the success or failure of the operation.
+     */
+    async openTgBotForInteract(force?: boolean): Promise<Result<void>> {
+        return this.openTgBotScreen(TgBotScreen.home, force, {
+            openForInteract: true
+        })
+    }
+
+    /**
      * Asynchronously opens the Telegram bot screen with the specified screen and force options.
      *
      * @param {TgBotScreen} screen - The screen to open on the Telegram bot.
      * @param {boolean} [force] - Optional flag indicating whether to force opening the screen.
+     * @param {SessionData} [extraData] - Optional extra data pass to session.
      * @return {Promise<Result<void>>} A promise that resolves with a Result object indicating the success or failure of the operation.
      */
-    async openTgBotScreen(screen: TgBotScreen, force?: boolean): Promise<Result<void>> {
+    async openTgBotScreen(screen: TgBotScreen, force?: boolean, extraData?: SessionData): Promise<Result<void>> {
         let href: string = ''
         switch (screen) {
             case TgBotScreen.home:
@@ -142,7 +156,21 @@ export class StavaxAccount {
                 return new Result(void 0, new Error('invalid TgBotScreen'))
         }
 
-        const session = await this.createSession({href})
+        return this.openTgBotWithSessionData({
+            ...(extraData || {}),
+            href,
+        }, force)
+    }
+
+    /**
+     * Opens the Telegram bot with the specified session data and force options.
+     *
+     * @param {SessionData} data - The session data object.
+     * @param {boolean} [force] - Optional flag indicating whether to force opening the bot.
+     * @return {Result<void>} A Result object indicating the success or failure of opening the bot.
+     */
+    async openTgBotWithSessionData(data: SessionData, force?: boolean): Promise<Result<void>> {
+        const session = await this.createSession(data)
         if (!session) {
             return new Result(void 0, new Error('cannot create new stavax session'))
         }

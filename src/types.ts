@@ -1,4 +1,4 @@
-import {Config} from "@wagmi/core/src/createConfig";
+import type {Config} from "@wagmi/core";
 
 export interface StavaxAccountConfig {
     projectID: string
@@ -19,6 +19,10 @@ export interface SessionData {
      * Path to target page
      */
     href?: string
+    /**
+     * Show loading in bot while wait for event
+     */
+    openForInteract?: boolean
 }
 
 export interface Session {

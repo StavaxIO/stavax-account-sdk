@@ -1,2 +1,2 @@
-export {StavaxAccount} from './stavaxAccount'
-export * from './types';
+export { StavaxAccount } from './stavaxAccount.js'
+export * from './types.js';
