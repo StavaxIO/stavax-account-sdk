@@ -121,6 +121,21 @@ export class StavaxAccount {
     }
 
     /**
+     * Opens the Telegram bot for interaction with a delay.
+     *
+     * @param {number} [delayMs=500] - The delay in milliseconds.
+     * @param {boolean} [force] - Optional flag indicating whether to force opening the screen.
+     * @return {() => void} A function that clears the timeout.
+     */
+    openTgBotForInteractWithDelay(delayMs: number = 500, force?: boolean): () => void {
+        const tid = setTimeout(() => {
+            return this.openTgBotForInteract(force)
+        }, delayMs)
+
+        return () => clearTimeout(tid)
+    }
+
+    /**
      * Asynchronously opens the Telegram bot for interact
      *
      * @param {boolean} [force] - Optional flag indicating whether to force opening the screen.
