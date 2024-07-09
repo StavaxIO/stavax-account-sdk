@@ -15,10 +15,10 @@ Stavax Account SDK depends on `wagmi` and `walletConnect`.
 ### Create a Stavax Account instance
 
 ```ts
-import { createConfig, http } from "@wagmi/core"
-import { avalanche, avalancheFuji } from "@wagmi/core/chains"
-import { walletConnect } from "@wagmi/connectors"
-import { StavaxAccount } from "@stavaxio/account-sdk"
+import {createConfig, http} from "@wagmi/core"
+import {avalanche, avalancheFuji} from "@wagmi/core/chains"
+import {walletConnect} from "@wagmi/connectors"
+import {StavaxAccount} from "@stavaxio/account-sdk"
 
 const stavaxAccount = new StavaxAccount({
     projectID: 'your-project-id',
@@ -61,6 +61,10 @@ Visit [wagmi](https://wagmi.sh) document for more details.
 ```ts
 // Open Bot home page
 stavaxAccount.openTgBot()
+// Open Bot home page with loading indicator to wait for event
+stavaxAccount.openTgBotForInteract()
+// Open Bot home page with delay. Returned function can be used to dicard the open
+const cancelFunc = stavaxAccount.openTgBotForInteractWithDelay(500)
 // Open deposit page
 stavaxAccount.openTgBotScreen(TgBotScreen.deposit)
 // Open bot with session, useful when need open bot manually when connect
