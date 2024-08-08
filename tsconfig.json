@@ -36,6 +36,7 @@
         // Skip type checking for node modules
         "skipLibCheck": true,
         "noErrorTruncation": true,
-        "sourceMap": true
+        "sourceMap": true,
+        "resolveJsonModule": true
     }
 }
