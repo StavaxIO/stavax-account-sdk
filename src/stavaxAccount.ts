@@ -2,11 +2,13 @@ import type {Session, SessionData, StavaxAccountConfig} from "./types.js";
 import {TgBotScreen} from "./types.js";
 import {connect, getConnectors} from "@wagmi/core";
 import {isTelegram, isTelegramMobile, openTelegramLink} from "./telegram.js";
-import { walletConnect, metaMask } from '@wagmi/connectors'
+import {walletConnect} from '@wagmi/connectors'
 import {Result} from "./result.js";
 
 const productionAPI = 'https://account-api.stavax.io'
 const productionBotURL = 'https://t.me/stavax_account_bot/app'
+
+export {walletConnect as walletConnectConnector}
 
 export class StavaxAccount {
     /**
@@ -222,10 +224,5 @@ export class StavaxAccount {
     getTgBotWebAppURL(session: Session): Result<string> {
         const command = encodeURIComponent(`sid=${session.id}`);
         return new Result(`${this.config.tgBotWebAppURL}?startapp=${command}`)
-    }
-
-    log() {
-        console.log(walletConnect)
-        console.log(metaMask())
     }
 }
