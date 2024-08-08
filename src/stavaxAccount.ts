@@ -1,4 +1,3 @@
-import axios, {type AxiosInstance} from "axios";
 import type {Session, SessionData, StavaxAccountConfig} from "./types.js";
 import {TgBotScreen} from "./types.js";
 import {connect, getConnectors} from "@wagmi/core";
@@ -9,8 +8,6 @@ const productionAPI = 'https://account-api.stavax.io'
 const productionBotURL = 'https://t.me/stavax_account_bot/app'
 
 export class StavaxAccount {
-    private readonly api: AxiosInstance;
-
     /**
      * Constructs a new instance of the StavaxAccount class.
      *
@@ -30,14 +27,9 @@ export class StavaxAccount {
             this.config.tgBotWebAppURL = productionBotURL
         }
 
-        if (!this.config.tgBotWebAppURL) {
+        if (!this.config.requestTimeout) {
             this.config.requestTimeout = 60_000
         }
-
-        this.api = axios.create({
-            baseURL: this.config.apiURL,
-            timeout: this.config.requestTimeout,
-        });
     }
 
     /**
@@ -97,13 +89,21 @@ export class StavaxAccount {
      */
     async createSession(data?: SessionData): Promise<Session | undefined> {
         try {
-            const res = await this.api.post<{ data: Session }>(
-                '/wallet-sessions/new', {
-                    project_id: this.config.projectID,
-                    data: data || {}
+            const res = await fetch(this.config.apiURL + '/wallet-sessions/new', {
+                    method: 'POST',
+                    mode: 'cors',
+                    body: JSON.stringify({
+                        project_id: this.config.projectID,
+                        data: data || {}
+                    })
                 },
             )
-            return res.data?.data
+            if (!res.ok) {
+                console.error('failed to create new stavax session')
+                return undefined
+            }
+            const json = await res.json()
+            return json.data
         } catch (err) {
             console.error(err)
             return undefined
