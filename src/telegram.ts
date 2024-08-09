@@ -20,6 +20,6 @@ export function isTelegramMobile(): boolean {
 
 export function isTelegram(): boolean {
     return telegramCheck(function () {
-        return !!Telegram.WebApp.platform
+        return !!Telegram.WebApp.platform && 'unknown' !== Telegram.WebApp.platform
     }, false)
 }

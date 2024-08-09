@@ -1,6 +1,6 @@
 {
   "name": "@stavaxio/account-sdk",
-  "version": "0.11.0-rc2",
+  "version": "0.11.0",
   "files": [
     "dist/**",
     "!dist/**/*.tsbuildinfo",
