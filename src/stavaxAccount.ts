@@ -4,6 +4,7 @@ import {connect, getConnectors} from "@wagmi/core";
 import {isTelegram, isTelegramMobile, openTelegramLink} from "./telegram.js";
 import {walletConnect} from '@wagmi/connectors'
 import {Result} from "./result.js";
+import {type ConnectReturnType} from "@wagmi/core";
 
 const productionAPI = 'https://account-api.stavax.io'
 const productionBotURL = 'https://t.me/stavax_account_bot/app'
@@ -43,6 +44,26 @@ export class StavaxAccount {
      * @return {Promise<Session | undefined>} Promise that resolves with a session object or undefined.
      */
     async connect(): Promise<Session | undefined> {
+        return this._connect()
+    }
+
+    /**
+     * Connects to the Stavax account with the provided configuration,
+     * resolves with wagmi connect data if successful,
+     * @param handleStavaxSession - Optional callback to handle the Stavax session object
+     */
+    async wagmiConnect(handleStavaxSession?: (session: Session) => void): Promise<ConnectReturnType> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const session = await this._connect(data => resolve(data), err => reject(err))
+                handleStavaxSession?.(session!)
+            } catch (err) {
+                reject(err)
+            }
+        })
+    }
+
+    private async _connect(onSuccess?: (data: ConnectReturnType) => void, onError?: (err: any) => void): Promise<Session | undefined> {
         const that = this
         return new Promise((resolve, reject) => {
             const connectors = getConnectors(this.config.wagmiConfig)
@@ -80,6 +101,11 @@ export class StavaxAccount {
             walletConnectConnector.emitter.on('message', onDisplayURI)
             connect(this.config.wagmiConfig, {
                 connector: walletConnectConnector
+            }).then(data => {
+                onSuccess?.(data)
+            }).catch(err => {
+                console.error(err)
+                onError?.(err)
             })
         })
     }
