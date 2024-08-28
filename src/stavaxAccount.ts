@@ -1,15 +1,31 @@
 import type {Session, SessionData, StavaxAccountConfig} from "./types.js";
 import {TgBotScreen} from "./types.js";
-import {connect, getConnectors} from "@wagmi/core";
+import {connect, type ConnectReturnType, getConnectors} from "@wagmi/core";
 import {isTelegram, isTelegramMobile, openTelegramLink} from "./telegram.js";
 import {walletConnect} from '@wagmi/connectors'
 import {Result} from "./result.js";
-import {type ConnectReturnType} from "@wagmi/core";
+import {randomString} from "./utils.js";
 
 const productionAPI = 'https://account-api.stavax.io'
 const productionBotURL = 'https://t.me/stavax_account_bot/app'
+const stavaxSDKDeviceIDKey = 'stavax-sdk-device-id';
 
 export {walletConnect as walletConnectConnector}
+
+function getSDKDeviceID(): string | undefined {
+    if ('localStorage' in window) {
+        let key = localStorage.getItem(stavaxSDKDeviceIDKey)
+        if (key) {
+            return key
+        }
+
+        key = randomString(64)
+        localStorage.setItem(stavaxSDKDeviceIDKey, key)
+        return key
+    }
+
+    return undefined
+}
 
 export class StavaxAccount {
     /**
@@ -123,6 +139,7 @@ export class StavaxAccount {
                     mode: 'cors',
                     body: JSON.stringify({
                         project_id: this.config.projectID,
+                        sdk_device_id: getSDKDeviceID(),
                         data: data || {}
                     })
                 },
