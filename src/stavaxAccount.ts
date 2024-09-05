@@ -95,6 +95,10 @@ export class StavaxAccount {
             return this.sendSmartSessionTransaction(smartSession.id, parameters)
         }
 
+        if (!this.config.disableAutoOpenTgBot) {
+            this.openTgBotForInteract().then(() => console.log(`openTgBotForInteract`))
+        }
+
         return sendTransaction(this.config.wagmiConfig, parameters)
     }
 
