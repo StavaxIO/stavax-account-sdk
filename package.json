@@ -1,6 +1,6 @@
 {
   "name": "@stavaxio/account-sdk",
-  "version": "0.13.0-dev.0",
+  "version": "0.13.0-dev.1",
   "files": [
     "dist/**",
     "!dist/**/*.tsbuildinfo",
@@ -23,7 +23,8 @@
   },
   "dependencies": {
     "@wagmi/connectors": "^5.0.15",
-    "@wagmi/core": "^2.11.3"
+    "@wagmi/core": "^2.11.3",
+    "viem": "^2.21.2"
   },
   "devDependencies": {
     "@types/node": "^17.0.35",

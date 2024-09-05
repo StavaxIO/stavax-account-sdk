@@ -1,10 +1,20 @@
-import type {Session, SessionData, StavaxAccountConfig} from "./types.js";
+import type {Session, SessionData, SmartSession, StavaxAccountConfig} from "./types.js";
 import {TgBotScreen} from "./types.js";
-import {connect, type ConnectReturnType, getConnectors} from "@wagmi/core";
+import {
+    connect,
+    type ConnectReturnType,
+    getChainId,
+    getConnectors,
+    sendTransaction,
+    type SendTransactionParameters,
+    type SendTransactionReturnType,
+    type WriteContractParameters
+} from "@wagmi/core";
 import {isTelegram, isTelegramMobile, openTelegramLink} from "./telegram.js";
 import {walletConnect} from '@wagmi/connectors'
 import {Result} from "./result.js";
 import {randomString} from "./utils.js";
+import {encodeFunctionData, type Hex, toHex} from "viem";
 
 const productionAPI = 'https://account-api.stavax.io'
 const productionBotURL = 'https://t.me/stavax_account_bot/app'
@@ -79,6 +89,30 @@ export class StavaxAccount {
         })
     }
 
+    async sendTransaction(parameters: SendTransactionParameters): Promise<SendTransactionReturnType | undefined> {
+        const smartSession = await this.findSmartSession(parameters)
+        if (smartSession) {
+            return this.sendSmartSessionTransaction(smartSession.id, parameters)
+        }
+
+        return sendTransaction(this.config.wagmiConfig, parameters)
+    }
+
+    async writeContract(parameters: WriteContractParameters): Promise<SendTransactionReturnType | undefined> {
+        const {abi, address, args, dataSuffix, functionName, ...request} = parameters
+        const data = encodeFunctionData({
+            abi,
+            args,
+            functionName,
+        })
+
+        return this.sendTransaction({
+            to: address,
+            data: `${data}${dataSuffix ? dataSuffix.replace('0x', '') : ''}`,
+            ...request
+        })
+    }
+
     private async _connect(onSuccess?: (data: ConnectReturnType) => void, onError?: (err: any) => void): Promise<Session | undefined> {
         const that = this
         return new Promise((resolve, reject) => {
@@ -132,14 +166,12 @@ export class StavaxAccount {
      * @param {SessionData} data - Optional data for the session.
      * @return {Promise<Session | undefined>} A promise that resolves with the created session or undefined.
      */
-    async createSession(data?: SessionData): Promise<Session | undefined> {
+    private async createSession(data?: SessionData): Promise<Session | undefined> {
         try {
-            const res = await fetch(this.config.apiURL + '/wallet-sessions/new', {
+            const res = await this._fetch('/wallet-sessions/new', {
                     method: 'POST',
-                    mode: 'cors',
                     body: JSON.stringify({
                         project_id: this.config.projectID,
-                        sdk_device_id: getSDKDeviceID(),
                         data: data || {}
                     })
                 },
@@ -154,6 +186,69 @@ export class StavaxAccount {
             console.error(err)
             return undefined
         }
+    }
+
+    private async findSmartSession(parameters: SendTransactionParameters): Promise<SmartSession | undefined> {
+        try {
+            const res = await this._fetch('/sdk-api/smart-wallets/sessions/find-session', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        sender_address: parameters.account,
+                        chain_id: parameters.chainId || getChainId(this.config.wagmiConfig),
+                        to: parameters.to,
+                        value: toHex(parameters.value || 0n),
+                        data: parameters.data
+                    })
+                },
+            )
+            if (!res.ok) {
+                console.error('cannot find smart session')
+                return undefined
+            }
+            const json = await res.json()
+            return json.data
+        } catch (err) {
+            console.error(err)
+            return undefined
+        }
+    }
+
+    private async sendSmartSessionTransaction(smartSessionID: string, parameters: SendTransactionParameters): Promise<Hex | undefined> {
+        try {
+            const res = await this._fetch('/sdk-api/smart-wallets/sessions/send-transaction', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        smart_session_id: smartSessionID,
+                        sender_address: parameters.account,
+                        chain_id: parameters.chainId || getChainId(this.config.wagmiConfig),
+                        to: parameters.to,
+                        value: toHex(parameters.value || 0n),
+                        data: parameters.data
+                    })
+                },
+            )
+            if (!res.ok) {
+                console.error('cannot find smart session')
+                return undefined
+            }
+            const json = await res.json()
+            return json.data?.tx_hash
+        } catch (err) {
+            console.error(err)
+            return undefined
+        }
+    }
+
+    private async _fetch(path: string, options?: RequestInit): Promise<Response> {
+        return fetch(this.config.apiURL + path, {
+                mode: 'cors',
+                headers: {
+                    'X-Project-ID': this.config.projectID,
+                    'X-SDK-Device-ID': getSDKDeviceID()!
+                },
+                ...(options || {})
+            },
+        )
     }
 
     /**

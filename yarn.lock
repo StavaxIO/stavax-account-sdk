@@ -723,6 +723,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@noble/hashes@npm:~1.5.0":
+  version: 1.5.0
+  resolution: "@noble/hashes@npm:1.5.0"
+  checksum: 10c0/1b46539695fbfe4477c0822d90c881a04d4fa2921c08c552375b444a48cac9930cb1ee68de0a3c7859e676554d0f3771999716606dc4d8f826e414c11692cdd9
+  languageName: node
+  linkType: hard
+
 "@npmcli/agent@npm:^2.0.0":
   version: 2.2.2
   resolution: "@npmcli/agent@npm:2.2.2"
@@ -1117,6 +1124,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@scure/base@npm:~1.1.8":
+  version: 1.1.8
+  resolution: "@scure/base@npm:1.1.8"
+  checksum: 10c0/f7a1d2b14bcccf263068210dde1237ad23f7b2381f5d4ac33b9377a077aa41327983863f86562651c4407bbf65e3e9e81f4ae565b045109d21acbcdb29d69cd9
+  languageName: node
+  linkType: hard
+
 "@scure/bip32@npm:1.4.0":
   version: 1.4.0
   resolution: "@scure/bip32@npm:1.4.0"
@@ -1135,6 +1149,16 @@ __metadata:
     "@noble/hashes": "npm:~1.4.0"
     "@scure/base": "npm:~1.1.6"
   checksum: 10c0/1ae1545a7384a4d9e33e12d9e9f8824f29b0279eb175b0f0657c0a782c217920054f9a1d28eb316a417dfc6c4e0b700d6fbdc6da160670107426d52fcbe017a8
+  languageName: node
+  linkType: hard
+
+"@scure/bip39@npm:1.4.0":
+  version: 1.4.0
+  resolution: "@scure/bip39@npm:1.4.0"
+  dependencies:
+    "@noble/hashes": "npm:~1.5.0"
+    "@scure/base": "npm:~1.1.8"
+  checksum: 10c0/dcdceeac348ed9c0f545c1a7ef8854ef62d6eb4e7b7aaafa4e2ef27f7e1c5744b0cd26292afd04e1ee59ae035b19abdd65174a444b8db8c238ccc662f6b90eac
   languageName: node
   linkType: hard
 
@@ -1324,6 +1348,7 @@ __metadata:
     "@wagmi/connectors": "npm:^5.0.15"
     "@wagmi/core": "npm:^2.11.3"
     typescript: "npm:^5.3.2"
+    viem: "npm:^2.21.2"
     vite: "npm:^5.4.0"
     vite-plugin-dts: "npm:^4.0.1"
   languageName: unknown
@@ -5493,6 +5518,28 @@ __metadata:
     typescript:
       optional: true
   checksum: 10c0/9f49fcd542ba0f7ed831ac386520c86ff15c0231559bc8d5db6547a993bd273884cad8178e16ed8d16b7ff8370208cf6fec87d5d8a996aa425eed6f9fba6a2a5
+  languageName: node
+  linkType: hard
+
+"viem@npm:^2.21.2":
+  version: 2.21.2
+  resolution: "viem@npm:2.21.2"
+  dependencies:
+    "@adraffy/ens-normalize": "npm:1.10.0"
+    "@noble/curves": "npm:1.4.0"
+    "@noble/hashes": "npm:1.4.0"
+    "@scure/bip32": "npm:1.4.0"
+    "@scure/bip39": "npm:1.4.0"
+    abitype: "npm:1.0.5"
+    isows: "npm:1.0.4"
+    webauthn-p256: "npm:0.0.5"
+    ws: "npm:8.17.1"
+  peerDependencies:
+    typescript: ">=5.0.4"
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 10c0/dabc09db88516a4b584b580d0b663183b6c58eb813db5efdf72041b5b43c147352b28008526bff282099bbeecd7c792aba4299c1a1ce332ca98229e65e4ccea0
   languageName: node
   linkType: hard
 

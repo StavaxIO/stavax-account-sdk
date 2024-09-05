@@ -30,6 +30,10 @@ export interface Session {
     data: SessionData
 }
 
+export interface SmartSession {
+    id: string
+}
+
 export enum TgBotScreen {
     home = 'home',
     deposit = 'deposit',
