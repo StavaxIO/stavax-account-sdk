@@ -2,7 +2,7 @@ import type {Session, SessionData, SmartSession, StavaxAccountConfig} from "./ty
 import {TgBotScreen} from "./types.js";
 import {
     connect,
-    type ConnectReturnType,
+    type ConnectReturnType, getAccount,
     getChainId,
     getConnectors,
     sendTransaction,
@@ -193,7 +193,7 @@ export class StavaxAccount {
             const res = await this._fetch('/sdk-api/smart-wallets/sessions/find-session', {
                     method: 'POST',
                     body: JSON.stringify({
-                        sender_address: parameters.account,
+                        sender_address: parameters.account || getAccount(this.config.wagmiConfig).address,
                         chain_id: parameters.chainId || getChainId(this.config.wagmiConfig),
                         to: parameters.to,
                         value: toHex(parameters.value || 0n),
@@ -219,7 +219,7 @@ export class StavaxAccount {
                     method: 'POST',
                     body: JSON.stringify({
                         smart_session_id: smartSessionID,
-                        sender_address: parameters.account,
+                        sender_address: parameters.account || getAccount(this.config.wagmiConfig).address,
                         chain_id: parameters.chainId || getChainId(this.config.wagmiConfig),
                         to: parameters.to,
                         value: toHex(parameters.value || 0n),
