@@ -92,7 +92,10 @@ export class StavaxAccount {
     async sendTransaction(parameters: SendTransactionParameters): Promise<SendTransactionReturnType | undefined> {
         const smartSession = await this.findSmartSession(parameters)
         if (smartSession) {
-            return this.sendSmartSessionTransaction(smartSession.id, parameters)
+            const txHash = await this.sendSmartSessionTransaction(smartSession.id, parameters)
+            if (txHash || this.config.disableSmartSessionFailSafe) {
+                return txHash
+            }
         }
 
         if (!this.config.disableAutoOpenTgBot) {
@@ -232,7 +235,7 @@ export class StavaxAccount {
                 },
             )
             if (!res.ok) {
-                console.error('cannot find smart session')
+                console.error('cannot send smart session')
                 return undefined
             }
             const json = await res.json()

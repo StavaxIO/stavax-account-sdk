@@ -17,15 +17,14 @@ Stavax Account SDK depends on `wagmi` and `walletConnect`.
 ```ts
 import {createConfig, http} from "@wagmi/core"
 import {avalanche, avalancheFuji} from "@wagmi/core/chains"
-import {walletConnect} from "@wagmi/connectors"
-import {StavaxAccount} from "@stavaxio/account-sdk"
+import {StavaxAccount, walletConnectConnector} from "@stavaxio/account-sdk"
 
 const stavaxAccount = new StavaxAccount({
     projectID: 'your-project-id',
     wagmiConfig: createConfig({
         chains: [avalanche, avalancheFuji],
         connectors: [
-            walletConnect({
+            walletConnectConnector({
                 projectId: 'your-wallet-connect-project-id',
                 showQrModal: false,
                 metadata: {
@@ -71,19 +70,52 @@ stavaxAccount.openTgBotScreen(TgBotScreen.deposit)
 stavaxAccount.openTgBotWithSession(session)
 ```
 
+### Pre-authorized Transaction
+
+Stavax Account SDK provides two methods built on top of wagmi functions for interacting with Pre-authorized
+Transactions.
+
+```ts
+stavaxAccount.sendTransaction({...})
+stavaxAccount.writeContract({...})
+```
+
+Two methods have same signature as wagmi functions.
+
+When using these methods, if a user has a Pre-authorized Transaction for the incoming transaction, SDK will
+automatically execute
+the transaction without requiring user confirmation. Otherwise, Stavax Account Bot will open to obtain confirmation from
+user.
+
+Read more about [Pre-authorized Transaction](https://docs.stavax.io/product/stavax-account/pre-authorized-transaction)
+
 ### Config
 
 ```ts
 import {Config} from "@wagmi/core/src/createConfig";
 
+/**
+ * Configuration options for StavaxAccount.
+ *
+ * @interface StavaxAccountConfig
+ * @property {string} projectID - Stavax Account ProjectID. This is required.
+ * @property {Config} wagmiConfig - Configuration object for Wagmi. This is required.
+ * @property {string} [apiURL] - Optional. URL to override the default API URL.
+ * @property {string} [tgBotWebAppURL] - Optional. URL to override the default Telegram bot web app URL.
+ * @property {boolean} [disableAutoOpenTgBot=false] - Optional. Disables automatic opening of the Telegram bot. Default is `false`.
+ * @property {boolean} [openTgBotOnDesktop=false] - Optional. Whether to open the Telegram bot on desktop. Default is `false`.
+ * @property {number} [requestTimeout=60000] - Optional. Timeout for requests in milliseconds. Default is 60,000 ms (60 seconds).
+ * @property {boolean} [disableSmartSessionFailSafe=false] - Optional. Disables the smart session fail-safe logic. By default, the SDK will fall back to the Wagmi function if the Stavax API responds with an unsuccessful status. Default is `false`.
+ */
 interface StavaxAccountConfig {
-    projectID: string // Stavax Account ProjectID. Required.
-    apiURL?: string // Override apiURL
-    tgBotWebAppURL?: string // Override tgBotWebAppURL
-    disableAutoOpenTgBot?: boolean // default false
-    openTgBotOnDesktop?: boolean // default false
-    requestTimeout?: number // Override requestTimeout, default 60s
-    wagmiConfig: Config // Wagmi config. Required.
+    projectID: string
+    wagmiConfig: Config
+    apiURL?: string
+    tgBotWebAppURL?: string
+    disableAutoOpenTgBot?: boolean
+    openTgBotOnDesktop?: boolean
+    requestTimeout?: number
+    disableSmartSessionFailSafe?: boolean
 }
 ```
 

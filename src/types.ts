@@ -2,12 +2,13 @@ import type {Config} from "@wagmi/core";
 
 export interface StavaxAccountConfig {
     projectID: string
+    wagmiConfig: Config
     apiURL?: string
     tgBotWebAppURL?: string
     disableAutoOpenTgBot?: boolean
     openTgBotOnDesktop?: boolean
     requestTimeout?: number
-    wagmiConfig: Config
+    disableSmartSessionFailSafe?: boolean
 }
 
 export interface SessionData {
