@@ -67,10 +67,27 @@ export class StavaxAccount {
      * resolves with a session object if successful,
      * or undefined if the connection fails.
      *
+     * @param {string} uri - Optional wallet connect URI
+     *
      * @return {Promise<Session | undefined>} Promise that resolves with a session object or undefined.
      */
-    async connect(): Promise<Session | undefined> {
-        return this._connect()
+    async connect(uri?: string): Promise<Session | undefined> {
+        if (uri) {
+            const session = await this.createSession({uri})
+            if (!session) {
+                throw new Error('cannot create stavax account session')
+            }
+
+            if (!this.config.disableAutoOpenTgBot) {
+                const result = this.openTgBotWithSession(session)
+                if (result.error) {
+                    throw result.error
+                }
+            }
+            return session
+        }
+
+        return this._startConnect()
     }
 
     /**
@@ -81,7 +98,7 @@ export class StavaxAccount {
     async wagmiConnect(handleStavaxSession?: (session: Session) => void): Promise<ConnectReturnType> {
         return new Promise(async (resolve, reject) => {
             try {
-                const session = await this._connect(data => resolve(data), err => reject(err))
+                const session = await this._startConnect(data => resolve(data), err => reject(err))
                 handleStavaxSession?.(session!)
             } catch (err) {
                 reject(err)
@@ -120,7 +137,7 @@ export class StavaxAccount {
         })
     }
 
-    private async _connect(onSuccess?: (data: ConnectReturnType) => void, onError?: (err: any) => void): Promise<Session | undefined> {
+    private async _startConnect(onSuccess?: (data: ConnectReturnType) => void, onError?: (err: any) => void): Promise<Session | undefined> {
         const that = this
         return new Promise((resolve, reject) => {
             const connectors = getConnectors(this.config.wagmiConfig)
@@ -136,23 +153,12 @@ export class StavaxAccount {
                     return;
                 }
                 walletConnectConnector?.emitter.off('message', onDisplayURI)
-                const session = await that.createSession({
-                    uri: payload.data as string,
-                })
-                if (!session) {
-                    reject(new Error('cannot create stavax account session'))
+                const uri = payload.data as string;
+                if (!uri) {
+                    reject(new Error('cannot get wallet connect URI'))
                     return
                 }
-
-                if (!that.config.disableAutoOpenTgBot) {
-                    const result = that.openTgBotWithSession(session)
-                    if (result.error) {
-                        reject(result.error)
-                        return
-                    }
-                }
-
-                resolve(session)
+                that.connect(uri).then(resolve).catch(reject)
             }
 
             walletConnectConnector.emitter.on('message', onDisplayURI)
