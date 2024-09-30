@@ -107,11 +107,13 @@ export class StavaxAccount {
     }
 
     async sendTransaction(parameters: SendTransactionParameters): Promise<SendTransactionReturnType | undefined> {
-        const smartSession = await this.findSmartSession(parameters)
-        if (smartSession) {
-            const txHash = await this.sendSmartSessionTransaction(smartSession.id, parameters)
-            if (txHash || this.config.disableSmartSessionFailSafe) {
-                return txHash
+        if (this.config.enableSmartSession) {
+            const smartSession = await this.findSmartSession(parameters)
+            if (smartSession) {
+                const txHash = await this.sendSmartSessionTransaction(smartSession.id, parameters)
+                if (txHash || this.config.disableSmartSessionFailSafe) {
+                    return txHash
+                }
             }
         }
 
