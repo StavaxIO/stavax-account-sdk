@@ -1,46 +1,46 @@
 {
-  "name": "@stavaxio/account-sdk",
-  "version": "0.14.1",
-  "files": [
-    "dist/**",
-    "!dist/**/*.tsbuildinfo",
-    "src/**/*.ts",
-    "!src/**/*.test.ts",
-    "!src/**/*.test-d.ts",
-    "LICENSE"
-  ],
-  "type": "module",
-  "main": "./dist/account-sdk.js",
-  "types": "./dist/index.d.ts",
-  "typings": "./dist/index.d.ts",
-  "license": "Apache-2.0",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/StavaxIO/stavax-account-sdk.git"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "dependencies": {
-    "@wagmi/connectors": "^5.0.15",
-    "@wagmi/core": "^2.11.3",
-    "viem": "^2.21.2"
-  },
-  "devDependencies": {
-    "@types/node": "^17.0.35",
-    "@types/telegram-web-app": "^7.2.1",
-    "typescript": "^5.3.2",
-    "vite": "^5.4.0",
-    "vite-plugin-dts": "^4.0.1"
-  },
-  "scripts": {
-    "clean": "rm -rf dist",
-    "build": "vite build",
-    "release:minor": "yarn version minor && yarn build",
-    "release:patch": "yarn version patch && yarn build"
-  },
-  "volta": {
-    "node": "20.14.0",
-    "yarn": "4.3.1"
-  }
+    "name": "@stavaxio/account-sdk",
+    "version": "0.15.0-dev.0",
+    "files": [
+        "dist/**",
+        "!dist/**/*.tsbuildinfo",
+        "src/**/*.ts",
+        "!src/**/*.test.ts",
+        "!src/**/*.test-d.ts",
+        "LICENSE"
+    ],
+    "type": "module",
+    "main": "./dist/account-sdk.js",
+    "types": "./dist/index.d.ts",
+    "typings": "./dist/index.d.ts",
+    "license": "Apache-2.0",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/StavaxIO/stavax-account-sdk.git"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "dependencies": {
+        "@wagmi/connectors": "^5.0.15",
+        "@wagmi/core": "^2.11.3",
+        "viem": "^2.21.2"
+    },
+    "devDependencies": {
+        "@types/node": "^17.0.35",
+        "@types/telegram-web-app": "^7.2.1",
+        "typescript": "^5.3.2",
+        "vite": "^5.4.0",
+        "vite-plugin-dts": "^4.0.1"
+    },
+    "scripts": {
+        "clean": "rm -rf dist",
+        "build": "vite build",
+        "release:minor": "yarn version minor && yarn build",
+        "release:patch": "yarn version patch && yarn build"
+    },
+    "volta": {
+        "node": "20.14.0",
+        "yarn": "4.3.1"
+    }
 }

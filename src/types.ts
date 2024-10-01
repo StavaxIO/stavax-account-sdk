@@ -1,4 +1,4 @@
-import type {Config} from "@wagmi/core";
+import type {Config} from '@wagmi/core';
 
 /**
  * Configuration options for StavaxAccount.
@@ -15,39 +15,41 @@ import type {Config} from "@wagmi/core";
  * @property {boolean} [disableSmartSessionFailSafe=false] - Optional. Disables the smart session fail-safe logic. By default, the SDK will fall back to the Wagmi function if the Stavax API responds with an unsuccessful status. Default is `false`.
  */
 export interface StavaxAccountConfig {
-    projectID: string
-    wagmiConfig: Config
-    apiURL?: string
-    tgBotWebAppURL?: string
-    disableAutoOpenTgBot?: boolean
-    openTgBotOnDesktop?: boolean
-    requestTimeout?: number
-    enableSmartSession?: boolean
-    disableSmartSessionFailSafe?: boolean
+    projectID: string;
+    wagmiConfig: Config;
+    apiURL?: string;
+    tgBotWebAppURL?: string;
+    webURL: string;
+    disableAutoOpenTgBot?: boolean;
+    openTgBotOnDesktop?: boolean;
+    requestTimeout?: number;
+    enableSmartSession?: boolean;
+    disableSmartSessionFailSafe?: boolean;
+    usingEmbeddedMode?: boolean;
 }
 
 export interface SessionData {
     /**
      * WalletConnect uri to pair
      */
-    uri?: string
+    uri?: string;
     /**
      * Path to target page
      */
-    href?: string
+    href?: string;
     /**
      * Show loading in bot while wait for event
      */
-    openForInteract?: boolean
+    openForInteract?: boolean;
 }
 
 export interface Session {
-    id: string
-    data: SessionData
+    id: string;
+    data: SessionData;
 }
 
 export interface SmartSession {
-    id: string
+    id: string;
 }
 
 export enum TgBotScreen {
