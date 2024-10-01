@@ -487,9 +487,9 @@ export class StavaxAccount {
     }
 
     private getIframeURL(session: Session, initData: string): string {
-        let url = this.config.webURL;
+        let url = `${this.config.webURL}?project_id=${encodeURIComponent(this.config.projectID)}`;
         if (session.data.uri || (session.data.href && session.data.href != '/')) {
-            url += `?tgWebAppStartParam=${encodeURIComponent(`sid=${session.id}`)}`;
+            url += `&tgWebAppStartParam=${encodeURIComponent(`sid=${session.id}`)}`;
         }
         return `${url}#tgWebAppData=${encodeURIComponent(initData)}&tgWebAppVersion=6.0&tgWebAppPlatform=stv_iframe`;
     }
