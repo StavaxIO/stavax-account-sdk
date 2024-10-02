@@ -367,7 +367,7 @@ export class StavaxAccount {
         if (isTelegram() && this.config.usingEmbeddedMode) {
             const drawer = Drawer.instance(this.config);
 
-            drawer.openURL(this.getIframeURL(session, Telegram.WebApp.initData))
+            drawer.openURL(this.getIframeURL(Telegram.WebApp.initData))
                 .then(() => drawer.postMessage({
                     from     : 'stavax_account_sdk',
                     eventType: 'stv_wallet_session',
@@ -390,11 +390,8 @@ export class StavaxAccount {
         return new Result(void 0);
     }
 
-    private getIframeURL(session: Session, initData: string): string {
+    private getIframeURL(initData: string): string {
         let url = `${this.config.webURL}?project_id=${encodeURIComponent(this.config.projectID)}`;
-        if (session.data.uri || (session.data.href && session.data.href != '/')) {
-            url += `&tgWebAppStartParam=${encodeURIComponent(`sid=${session.id}`)}`;
-        }
         return `${url}#tgWebAppData=${encodeURIComponent(initData)}&tgWebAppVersion=6.0&tgWebAppPlatform=stv_iframe`;
     }
 
