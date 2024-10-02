@@ -3,6 +3,7 @@ import type {StavaxAccountConfig} from './types.js';
 export class Drawer {
     private static _instance: Drawer;
     private isOpen: boolean = false;
+    private iframeReady: boolean = false;
     private readonly config: StavaxAccountConfig;
     private readonly drawerRoot: HTMLDivElement;
     private readonly drawerOverlay: HTMLDivElement;
@@ -19,24 +20,26 @@ export class Drawer {
     public async openURL(url: string): Promise<void> {
         return new Promise((resolve, _) => {
             let iframe = this.drawerRoot.querySelector('iframe');
-            let insertedRecently = false;
             if (!iframe) {
                 iframe = this.htmlToElement(`<iframe class="stavax-iframe"></iframe>`) as HTMLIFrameElement;
                 this.drawerRoot.appendChild(iframe);
-                insertedRecently = true;
-                iframe.addEventListener('load', function () {
-                    resolve();
-                }, {once: true});
             }
             iframe.src = url;
 
             this.changeOpen(true);
 
-            if (!insertedRecently) {
-                resolve();
+            if (this.iframeReady) {
+                resolve()
+                return;
             }
-        });
 
+            const itv = setInterval(() => {
+                if (this.iframeReady) {
+                    clearInterval(itv)
+                    resolve()
+                }
+            }, 100)
+        });
     }
 
     public postMessage(message: any) {
@@ -78,6 +81,11 @@ export class Drawer {
         const method = data.method.substring(i + 1);
 
         switch (scope) {
+            case 'stv':
+                if (method == 'app_ready') {
+                    this.iframeReady = true
+                }
+                break
             case 'tgWebAppNavigation':
                 // @ts-ignore
                 return Telegram.WebApp[method](...data.params);
