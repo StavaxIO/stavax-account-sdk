@@ -45,6 +45,7 @@ export interface SessionData {
 
 export interface Session {
     id: string;
+    project_id: string;
     data: SessionData;
 }
 
