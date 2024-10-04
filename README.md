@@ -1,62 +1,125 @@
 # Stavax Account SDK
 
-```
-yarn add @stavaxio/account-sdk 
-```
-
 ## Prerequisites
 
-**Important:** You need to create Stavax Account project to use this SDK.
+- Familiarity with [Wagmi](https://wagmi.sh): The Stavax Account SDK serves as a bridge between dApps and Stavax Account using the `walletConnect`
+  connector from Wagmi.
+  Your dApp will still use Wagmi for core actions, including checking connection status, sending on-chain transactions, and interacting with
+  contracts.
+
+- Setting Up Telegram Mini Apps: Ensure your Telegram Mini App is configured with
+  the [Telegram Web App script](https://core.telegram.org/bots/webapps#initializing-mini-apps) `telegram-web-app.js` to support open Stavax Account
+  Bot from your mini app.
+
+- **Important:** You need to create Stavax Account project to use this SDK.
+
+## Installation
+
+```
+npm i @stavaxio/account-sdk
+```
 
 ## Usage
 
 Stavax Account SDK depends on `wagmi` and `walletConnect`.
 
-### Create a Stavax Account instance
+### Create a wagmiConfig File
+
+To integrate Stavax Account with your dApp, you'll need a wagmiConfig instance that can be shared between Stavax Account and the Wagmi Provider.
 
 ```ts
+// wagmiConfig.ts
 import {createConfig, http} from "@wagmi/core"
-import {avalanche, avalancheFuji} from "@wagmi/core/chains"
-import {StavaxAccount, walletConnectConnector} from "@stavaxio/account-sdk"
+import {sei, seiTestnet} from "@wagmi/core/chains"
 
-const stavaxAccount = new StavaxAccount({
-    projectID: 'your-project-id',
-    wagmiConfig: createConfig({
-        chains: [avalanche, avalancheFuji],
-        connectors: [
-            walletConnectConnector({
-                projectId: 'your-wallet-connect-project-id',
-                showQrModal: false,
-                metadata: {
-                    name: 'Demo',
-                    description: 'Demo description',
-                    url: 'https://demo.com',
-                    icons: ['https://avatars.githubusercontent.com/u/37784886']
-                }
-            })
-        ],
-        transports: {
-            [avalanche.id]: http(),
-            [avalancheFuji.id]: http(),
-        },
-    })
+export const wagmiConfig = createConfig({
+    chains: [sei, seiTestnet],
+    connectors: [
+        walletConnectConnector({
+            projectId: 'your-wallet-connect-project-id',
+            showQrModal: false,
+            metadata: {
+                name: 'Demo',
+                description: 'Demo description',
+                url: 'https://demo.com',
+                icons: ['https://avatars.githubusercontent.com/u/37784886']
+            }
+        })
+    ],
+    transports: {
+        [sei.id]: http(),
+        [seiTestnet.id]: http(),
+    },
 })
 ```
 
+### Using the `wagmiConfig` Instance with Stavax Account
+
+You can now use this wagmiConfig instance to create a StavaxAccount instance in your application:
+
+```ts
+import {StavaxAccount} from "@stavaxio/account-sdk"
+import {wagmiConfig} from "./wagmiConfig"
+
+const stavaxAccount = new StavaxAccount({
+    projectID: 'your-stavax-project-id',
+    wagmiConfig: wagmiConfig
+})
+```
+
+### Using `wagmiConfig` with Wagmi Provider
+
+In addition to the Stavax Account SDK, you'll likely want to initialize the Wagmi provider in your application using the same wagmiConfig:
+
+```tsx
+// App.tsx
+import {WagmiProvider} from 'wagmi';
+import {wagmiConfig} from './wagmiConfig';
+
+function App() {
+    return (
+        <WagmiProvider config={wagmiConfig}>
+            {/* Rest of your app components */}
+        </WagmiProvider>
+    );
+}
+
+export default App;
+
+```
+
 ### Trigger connect
+
+#### Basic Connect
+
+The simplest way to trigger a connection is by calling the connect method, which will automatically open the Stavax Bot on Telegram Mobile by default:
 
 ```ts
 const session = await stavaxAccount.connect()
 ```
 
-By default, Stavax Account SDK will open Stavax Bot on Telegram Mobile.
+The session object returned here is a Stavax Session, which you can use for further interactions, such as manually opening the Telegram bot or
+retrieving the WalletConnect URI.
 
-You can change this behavior by setting `disableAutoOpenTgBot` and `openTgBotOnDesktop` in the config object.
+To control the bot's automatic opening behavior, you can adjust these settings in your StavaxAccount configuration:
 
-#### Using wallet connect URI
+- `disableAutoOpenTgBot`: Set to true to disable the SDK's default behavior of opening the Telegram bot on connect.
+- `openTgBotOnDesktop`: Set to true if you prefer the bot to open on desktop rather than mobile.
 
-If you want to use a WalletConnect URI to connect to Stavax, you can pass the wallet connect URI to the `connect`
-method.
+Example
+
+```ts
+const stavaxAccount = new StavaxAccount({
+    projectID: 'your-project-id',
+    wagmiConfig: wagmiConfig,
+    disableAutoOpenTgBot: true, // Disables automatic bot opening
+    openTgBotOnDesktop: true,    // Opens bot on desktop if needed
+});
+```
+
+#### Connect Using wallet connect URI
+
+You can also initiate the connection directly using a WalletConnect URI if you want additional control:
 
 ```ts
 const session = await stavaxAccount.connect('wc:12345678')
@@ -64,13 +127,11 @@ const session = await stavaxAccount.connect('wc:12345678')
 
 #### Retrieving connect result from wagmi
 
-If you want to retrieve connect result from wagmi, you can use `wagmiConnect` method.
+To directly obtain the connect result from Wagmi, you can use `.wagmiConnect()`:
 
 ```ts
 const connectResult = await stavaxAccount.wagmiConnect() // wagmi ConnectReturnType
 ```
-
-Visit [wagmi](https://wagmi.sh) document for more details.
 
 ### Send Transaction
 
@@ -100,22 +161,22 @@ automatically execute
 the transaction without requiring user confirmation. Otherwise, Stavax Account Bot will open to obtain confirmation from
 user.
 
+The SDK has built-in error handling for transaction failures:
+
+- `disableSmartSessionFailSafe`: By default, the SDK will fall back to Wagmi's transaction function if the Stavax API returns an error. Set this to
+  true if you want to disable the fail-safe mechanism.
+
 Read more about [Pre-authorized Transaction](https://docs.stavax.io/product/stavax-account/pre-authorized-transaction)
 
 ### Stavax Bot Interaction
 
-```ts
-// Open Bot home page
-stavaxAccount.openTgBot()
-// Open Bot home page with loading indicator to wait for event
-stavaxAccount.openTgBotForInteract()
-// Open Bot home page with delay. Returned function can be used to dicard the open
-const cancelFunc = stavaxAccount.openTgBotForInteractWithDelay(500)
-// Open deposit page
-stavaxAccount.openTgBotScreen(TgBotScreen.deposit)
-// Open bot with session, useful when need open bot manually when connect
-stavaxAccount.openTgBotWithSession(session)
-```
+| Method                                 | Description                                                                                             |
+|----------------------------------------|:--------------------------------------------------------------------------------------------------------|
+| `openTgBot()`                          | Opens the bot’s home page.                                                                              |
+| `openTgBotForInteract()`               | Opens the bot with an interaction loading indicator.                                                    |
+| `openTgBotForInteractWithDelay(ms)`    | Opens the bot after a specified delay (in ms); returns a function to cancel the delayed open if needed. |
+| `openTgBotScreen(screen: TgBotScreen)` | Opens a specific bot screen (e.g., deposit, withdrawal) based on `TgBotScreen` enum.                    |
+| `openTgBotWithSession(session)`        | Opens the bot with the active Stavax session, ensuring state continuity..                               |
 
 ### Config
 
