@@ -29,22 +29,22 @@ export class Drawer {
             this.changeOpen(true);
 
             if (this.iframeReady) {
-                resolve()
+                resolve();
                 return;
             }
 
             const itv = setInterval(() => {
                 if (this.iframeReady) {
-                    clearInterval(itv)
-                    resolve()
+                    clearInterval(itv);
+                    resolve();
                 }
-            }, 100)
+            }, 100);
         });
     }
 
     public postMessage(message: any) {
         const iframe = this.drawerRoot.querySelector('iframe');
-        iframe?.contentWindow?.postMessage(message, this.config.webURL);
+        iframe?.contentWindow?.postMessage(message, this.config.webURL!);
     }
 
     public close() {
@@ -83,9 +83,9 @@ export class Drawer {
         switch (scope) {
             case 'stv':
                 if (method == 'app_ready') {
-                    this.iframeReady = true
+                    this.iframeReady = true;
                 }
-                break
+                break;
             case 'tgWebAppNavigation':
                 // @ts-ignore
                 return Telegram.WebApp[method](...data.params);
