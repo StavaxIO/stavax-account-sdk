@@ -31,6 +31,7 @@ To integrate Stavax Account with your dApp, you'll need a wagmiConfig instance t
 // wagmiConfig.ts
 import {createConfig, http} from "@wagmi/core"
 import {sei, seiTestnet} from "@wagmi/core/chains"
+import {walletConnectConnector} from "@stavaxio/account-sdk"
 
 export const wagmiConfig = createConfig({
     chains: [sei, seiTestnet],
