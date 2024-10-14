@@ -19,6 +19,24 @@
 npm i @stavaxio/account-sdk
 ```
 
+### Setup for Nuxt
+
+Currently, StavaxAccount only works with Nuxt Client only code. To use it in SSR mode, please add `@stavaxio/account-sdk` to the `build.transpile`
+section in nuxt config file.
+
+```ts
+// nuxt.config.ts
+export default defineNuxtConfig({
+    // other settings
+    build: {
+        transpile: [
+            //other deps
+            '@stavaxio/account-sdk',
+        ],
+    },
+});
+```
+
 ## Usage
 
 Stavax Account SDK depends on `wagmi` and `walletConnect`.
