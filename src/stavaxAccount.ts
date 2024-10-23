@@ -1,4 +1,4 @@
-import {walletConnect}                                                from '@wagmi/connectors';
+import {walletConnect}                                                                                            from '@wagmi/connectors';
 import {
     connect,
     type ConnectReturnType,
@@ -9,14 +9,14 @@ import {
     type SendTransactionParameters,
     type SendTransactionReturnType,
     type WriteContractParameters,
-}                                                                     from '@wagmi/core';
-import {encodeFunctionData, type Hex, toHex}                          from 'viem';
-import {Drawer}                                                       from './embedded.js';
-import {Result}                                                       from './result.js';
-import {isTelegram, isTelegramMobile, openTelegramLink}               from './telegram.js';
-import type {Session, SessionData, SmartSession, StavaxAccountConfig} from './types.js';
-import {TgBotScreen}                                                  from './types.js';
-import {randomString}                                                 from './utils.js';
+}                                                                                                                 from '@wagmi/core';
+import {encodeFunctionData, type Hex, toHex}                                                                      from 'viem';
+import {Drawer}                                                                                                   from './embedded.js';
+import {Result}                                                                                                   from './result.js';
+import {isTelegram, isTelegramMobile, openTelegramLink}                                                           from './telegram.js';
+import type {EthereumProviderRequest, Session, SessionData, SmartSession, StavaxAccountConfig, SupportedPlatform} from './types.js';
+import {TgBotScreen}                                                                                              from './types.js';
+import {randomString}                                                                                             from './utils.js';
 
 const productionAPI = 'https://account-api.stavax.io';
 const productionBotURL = 'https://t.me/stavax_account_bot/app';
@@ -364,6 +364,11 @@ export class StavaxAccount {
      * @return {Result<void>} A Result object indicating the success or failure of opening the bot.
      */
     openTgBotWithSession(session: Session, force?: boolean): Result<void> {
+        if (this.config.usingInjectedMode && session.data.openForInteract) {
+            // When using injected mode, skip the openForInteract request since request will be sent directly via postMessage
+            return new Result(void 0);
+        }
+
         if (isTelegram() && this.config.usingEmbeddedMode) {
             const drawer = Drawer.instance(this.config);
 
@@ -404,5 +409,46 @@ export class StavaxAccount {
     getTgBotWebAppURL(session: Session): Result<string> {
         const command = encodeURIComponent(`sid=${session.id}`);
         return new Result(`${this.config.tgBotWebAppURL}?startapp=${command}`);
+    }
+
+    get isInjected() {
+        return this.config.usingInjectedMode || this.config.webURL == window.location.ancestorOrigins?.[0];
+    }
+
+    async request(platform: SupportedPlatform, request: EthereumProviderRequest): Promise<any> {
+        if (this.isInjected) {
+            return this.injectedRequest(platform, request);
+        }
+
+        //TODO: create request and open Stavax Bot
+        throw new Error('send provider request without injected is not implemented');
+    }
+
+    async injectedRequest(platform: SupportedPlatform, request: EthereumProviderRequest): Promise<any> {
+        const id = randomString(32);
+        return new Promise<any>((resolve, reject) => {
+            const handler = (e: any) => {
+                if (e.data.id !== id) return;
+                window?.removeEventListener('message', handler);
+                if (e.data.from != 'stavax_account' || e.data.eventType != 'stv_injected_provider_response') {
+                    return;
+                }
+                if (e.data.success) {
+                    return resolve(e.data.eventData);
+                }
+
+                return reject(e.data.eventData);
+            };
+
+            window?.parent.postMessage({
+                id,
+                from     : 'stavax_account_sdk',
+                eventType: 'stv_injected_provider_request',
+                eventData: {
+                    platform, request,
+                },
+            }, '*');
+            window?.addEventListener('message', handler);
+        });
     }
 }

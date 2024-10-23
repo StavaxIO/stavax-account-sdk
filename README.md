@@ -37,7 +37,7 @@ export default defineNuxtConfig({
 });
 ```
 
-## Usage
+## Configure
 
 Stavax Account SDK depends on `wagmi` and `walletConnect`.
 
@@ -47,13 +47,14 @@ To integrate Stavax Account with your dApp, you'll need a wagmiConfig instance t
 
 ```ts
 // wagmiConfig.ts
-import {createConfig, http} from "@wagmi/core"
+import {createConfig, http, injected} from "@wagmi/core"
 import {sei, seiTestnet} from "@wagmi/core/chains"
 import {walletConnectConnector} from "@stavaxio/account-sdk"
 
 export const wagmiConfig = createConfig({
     chains: [sei, seiTestnet],
     connectors: [
+        injected(),
         walletConnectConnector({
             projectId: 'your-wallet-connect-project-id',
             showQrModal: false,
@@ -107,7 +108,24 @@ export default App;
 
 ```
 
-### Trigger connect
+## Connect Stavax Account
+
+### Use Stavax Account as injected provider (beta)
+
+Stavax Account can be configured as injected provider
+
+```ts
+import {StavaxAccount} from "@stavaxio/account-sdk"
+import {setupStavaxProvider} from '@stavaxio/account-sdk/adapter/evm'
+
+const stavaxAccount = new StavaxAccount({
+    projectID: 'your-project-id',
+    wagmiConfig: wagmiConfig, // wagmiConfig with injected() connectors
+})
+setupStavaxProvider(stavaxAccount)
+```
+
+### Use Stavax Account on top of Wallet Connect
 
 #### Basic Connect
 

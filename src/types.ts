@@ -28,6 +28,7 @@ export interface StavaxAccountConfig {
     enableSmartSession?: boolean;
     disableSmartSessionFailSafe?: boolean;
     usingEmbeddedMode?: boolean;
+    usingInjectedMode?: boolean;
 }
 
 export interface SessionData {
@@ -59,4 +60,12 @@ export enum TgBotScreen {
     home = 'home',
     deposit = 'deposit',
     withdraw = 'withdraw'
+}
+
+export type SupportedPlatform = 'ethereum'
+
+export interface EthereumProviderRequest {
+    account?: { chainId: number; address: string | null };
+    method: string;
+    params: any[];
 }
