@@ -364,8 +364,16 @@ export class StavaxAccount {
      * @return {Result<void>} A Result object indicating the success or failure of opening the bot.
      */
     openTgBotWithSession(session: Session, force?: boolean): Result<void> {
-        if (session.data.openForInteract && this.isInjected && !force) {
-            // When using injected mode, skip the openForInteract request since request will be sent directly via postMessage
+        if (this.isInjected && !force) {
+            if (session.data.openForInteract) {
+                // When using injected mode, skip the openForInteract request since the Stavax Account is already opened
+                return new Result(void 0);
+            }
+            window.parent?.postMessage({
+                from     : 'stavax_account_sdk',
+                eventType: 'stv_wallet_session',
+                eventData: session,
+            });
             return new Result(void 0);
         }
 
