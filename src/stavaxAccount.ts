@@ -373,7 +373,7 @@ export class StavaxAccount {
                 from     : 'stavax_account_sdk',
                 eventType: 'stv_wallet_session',
                 eventData: session,
-            });
+            }, '*');
             return new Result(void 0);
         }
 
