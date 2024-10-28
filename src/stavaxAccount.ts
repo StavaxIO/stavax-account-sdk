@@ -1,5 +1,6 @@
 import {walletConnect}                                                                                            from '@wagmi/connectors';
 import {
+    type Config,
     connect,
     type ConnectReturnType,
     getAccount,
@@ -69,6 +70,18 @@ export class StavaxAccount {
         }
     }
 
+    public setWagmiConfig(wagmiConfig: Config) {
+        this.config.wagmiConfig = wagmiConfig;
+    }
+
+    private getWagmiConfig(): Config {
+        if (!this.config.wagmiConfig) {
+            throw new Error('Missing wagmiConfig. Please provide wagmiConfig to stavaxAccount');
+        }
+
+        return this.config.wagmiConfig;
+    }
+
     /**
      * Connects to the Stavax account with the provided configuration,
      * resolves with a session object if successful,
@@ -128,7 +141,7 @@ export class StavaxAccount {
             this.openTgBotForInteract().then(() => console.log(`openTgBotForInteract`));
         }
 
-        return sendTransaction(this.config.wagmiConfig, parameters);
+        return sendTransaction(this.getWagmiConfig(), parameters);
     }
 
     async writeContract(parameters: WriteContractParameters): Promise<SendTransactionReturnType | undefined> {
@@ -149,7 +162,7 @@ export class StavaxAccount {
     private async _startConnect(onSuccess?: (data: ConnectReturnType) => void, onError?: (err: any) => void): Promise<Session | undefined> {
         const that = this;
         return new Promise((resolve, reject) => {
-            const connectors = getConnectors(this.config.wagmiConfig);
+            const connectors = getConnectors(this.getWagmiConfig());
 
             const walletConnectConnector = connectors.find(c => c.id === 'walletConnect');
             if (!walletConnectConnector) {
@@ -171,7 +184,7 @@ export class StavaxAccount {
             }
 
             walletConnectConnector.emitter.on('message', onDisplayURI);
-            connect(this.config.wagmiConfig, {
+            connect(this.getWagmiConfig(), {
                 connector: walletConnectConnector,
             }).then(data => {
                 onSuccess?.(data);
@@ -215,8 +228,8 @@ export class StavaxAccount {
             const res = await this._fetch('/sdk-api/smart-wallets/sessions/find-session', {
                     method: 'POST',
                     body  : JSON.stringify({
-                        sender_address: parameters.account || getAccount(this.config.wagmiConfig).address,
-                        chain_id      : parameters.chainId || getChainId(this.config.wagmiConfig),
+                        sender_address: parameters.account || getAccount(this.getWagmiConfig()).address,
+                        chain_id      : parameters.chainId || getChainId(this.getWagmiConfig()),
                         to            : parameters.to,
                         value         : toHex(parameters.value || 0n),
                         data          : parameters.data,
@@ -241,8 +254,8 @@ export class StavaxAccount {
                     method: 'POST',
                     body  : JSON.stringify({
                         smart_session_id: smartSessionID,
-                        sender_address  : parameters.account || getAccount(this.config.wagmiConfig).address,
-                        chain_id        : parameters.chainId || getChainId(this.config.wagmiConfig),
+                        sender_address  : parameters.account || getAccount(this.getWagmiConfig()).address,
+                        chain_id        : parameters.chainId || getChainId(this.getWagmiConfig()),
                         to              : parameters.to,
                         value           : toHex(parameters.value || 0n),
                         data            : parameters.data,

@@ -18,7 +18,7 @@ import type {Config} from '@wagmi/core';
  */
 export interface StavaxAccountConfig {
     projectID: string;
-    wagmiConfig: Config;
+    wagmiConfig?: Config;
     apiURL?: string;
     tgBotWebAppURL?: string;
     webURL?: string;
