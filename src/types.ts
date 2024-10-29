@@ -64,6 +64,12 @@ export enum TgBotScreen {
 
 export type SupportedPlatform = 'ethereum'
 
+export interface PageMetadata {
+    title: string,
+    url: string,
+    icon?: string | undefined | null,
+}
+
 export interface EthereumProviderRequest {
     account?: { chainId: number; address: string | null };
     method: string;
