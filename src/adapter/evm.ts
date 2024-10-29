@@ -36,7 +36,7 @@ class EthereumProvider {
     }
 
     isConnected() {
-        return this.stavaxAccount.isInjected || this.address != null;
+        return !!this.address;
     }
 
     get account() {
