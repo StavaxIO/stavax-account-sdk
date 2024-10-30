@@ -1,5 +1,6 @@
-import {defineConfig} from 'vite';
-import dts            from 'vite-plugin-dts';
+import type {ModuleFormat} from 'rollup';
+import {defineConfig}      from 'vite';
+import dts                 from 'vite-plugin-dts';
 
 export default defineConfig({
     define : {
@@ -9,8 +10,14 @@ export default defineConfig({
     },
     build  : {
         lib          : {
-            entry  : './src/index.ts',
-            formats: ['es'], // pure ESM package
+            entry   : {
+                index: './src/index.ts',
+                'adapter/evm': './src/adapter/evm.ts',
+            },
+            formats : ['es'],
+            fileName: (_: ModuleFormat, entryName: string) => {
+                return entryName + '.js';
+            },
         },
         rollupOptions: {
             external: [
@@ -19,5 +26,5 @@ export default defineConfig({
             ],
         },
     },
-    plugins: [dts()], // emit TS declaration files
+    plugins: [dts()],
 });

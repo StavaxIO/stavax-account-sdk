@@ -1,14 +1,6 @@
 {
     "name": "@stavaxio/account-sdk",
-    "version": "0.16.0",
-    "files": [
-        "dist/**",
-        "!dist/**/*.tsbuildinfo",
-        "src/**/*.ts",
-        "!src/**/*.test.ts",
-        "!src/**/*.test-d.ts",
-        "LICENSE"
-    ],
+    "version": "0.16.0-rc.0",
     "type": "module",
     "main": "./dist/account-sdk.js",
     "types": "./dist/index.d.ts",
@@ -22,9 +14,20 @@
         "access": "public"
     },
     "dependencies": {
-        "@wagmi/connectors": "^5.3.3",
         "@wagmi/core": "^2.14.1",
         "viem": "^2.21.34"
+    },
+    "files": [
+        "dist/**",
+        "!dist/**/*.tsbuildinfo",
+        "src/**/*.ts",
+        "!src/**/*.test.ts",
+        "!src/**/*.test-d.ts",
+        "LICENSE"
+    ],
+    "exports": {
+        ".": "./dist/index.js",
+        "./adapter/evm": "./dist/adapter/evm.js"
     },
     "devDependencies": {
         "@types/telegram-web-app": "^7.10.1",
