@@ -14,7 +14,8 @@ import type {Config} from '@wagmi/core';
  * @property {number} [requestTimeout=60000] - Optional. Timeout for requests in milliseconds. Default is 60,000 ms (60 seconds).
  * @property {boolean} [enableSmartSession=false] - Optional. Enables the smart session. Default is `false`.
  * @property {boolean} [disableSmartSessionFailSafe=false] - Optional. Disables the smart session fail-safe logic. By default, the SDK will fall back to the Wagmi function if the Stavax API responds with an unsuccessful status. Default is `false`.
- * @property {boolean} [usingEmbeddedMode=false] - Optional. Open Embedded Stavax Account (iframe) instead of Stavax Account Bot
+ * @property {boolean} [usingEmbeddedMode=false] - Optional. Open Embedded Stavax Account (iframe) instead of Stavax Account Bot.
+ * @property {boolean} [usingInjectedMode=false] - Optional. Using Stavax Account Injected provider.
  */
 export interface StavaxAccountConfig {
     projectID: string;
@@ -65,9 +66,10 @@ export enum TgBotScreen {
 export type SupportedPlatform = 'ethereum'
 
 export interface PageMetadata {
-    title: string,
-    url: string,
-    icon?: string | undefined | null,
+    projectID: string;
+    title: string;
+    url: string;
+    icon?: string | undefined | null;
 }
 
 export interface EthereumProviderRequest {

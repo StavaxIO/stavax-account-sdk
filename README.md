@@ -241,6 +241,7 @@ import {Config} from "@wagmi/core/src/createConfig";
  * @property {boolean} [enableSmartSession=false] - Optional. Enables the smart session. Default is `false`.
  * @property {boolean} [disableSmartSessionFailSafe=false] - Optional. Disables the smart session fail-safe logic. By default, the SDK will fall back to the Wagmi function if the Stavax API responds with an unsuccessful status. Default is `false`.
  * @property {boolean} [usingEmbeddedMode=false] - Optional. Open Embedded Stavax Account (iframe) instead of Stavax Account Bot
+ * @property {boolean} [usingInjectedMode=false] - Optional. Using Stavax Account Injected provider.
  */
 interface StavaxAccountConfig {
     projectID: string;
@@ -254,6 +255,7 @@ interface StavaxAccountConfig {
     enableSmartSession?: boolean;
     disableSmartSessionFailSafe?: boolean;
     usingEmbeddedMode?: boolean;
+    usingInjectedMode?: boolean;
 }
 ```
 
