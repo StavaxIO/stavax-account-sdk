@@ -1,4 +1,3 @@
-import {walletConnect}                                                                                                          from '@wagmi/connectors';
 import {
     type Config,
     connect,
@@ -23,8 +22,6 @@ const productionAPI = 'https://account-api.stavax.io';
 const productionBotURL = 'https://t.me/stavax_account_bot/app';
 const productionWebURL = 'https://account.stavax.io';
 const stavaxSDKDeviceIDKey = 'stavax-sdk-device-id';
-
-export {walletConnect as walletConnectConnector};
 
 function getSDKDeviceID(): string | undefined {
     if ('localStorage' in window) {
