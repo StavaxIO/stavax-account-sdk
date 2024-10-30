@@ -12,6 +12,8 @@ const storagePrefix = 'stavaxEthereumProvider_';
 const addressKey = `${storagePrefix}evmAddress`;
 const chainIDKey = `${storagePrefix}chainId`;
 
+export const ProviderRDNS = 'io.stavax.account';
+
 class EthereumProvider {
     private static instance: EthereumProvider | undefined;
 
@@ -142,7 +144,7 @@ function announceProvider(stavaxAccount: StavaxAccount, customProvider?: CustomP
                 info    : {
                     name: 'Stavax Account',
                     icon: logo,
-                    rdns: 'io.stavax.account',
+                    rdns: ProviderRDNS,
                     uuid: '307a159f-66fd-425b-8f46-659836a9250c',
                 },
             }),

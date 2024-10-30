@@ -1,6 +1,7 @@
 import {
     type Config,
     connect,
+    type Connector,
     type ConnectReturnType,
     getAccount,
     getChainId,
@@ -9,11 +10,13 @@ import {
     type SendTransactionParameters,
     type SendTransactionReturnType,
     type WriteContractParameters,
-}                                                                                                                               from '@wagmi/core';
-import {encodeFunctionData, type Hex, toHex}                                                                                    from 'viem';
-import {Drawer}                                                                                                                 from './embedded.js';
-import {Result}                                                                                                                 from './result.js';
-import {isTelegram, isTelegramMobile, openTelegramLink}                                                                         from './telegram.js';
+}                                                       from '@wagmi/core';
+import {encodeFunctionData, type Hex, toHex}            from 'viem';
+import {ProviderRDNS}                                   from './adapter/evm.js';
+import {Drawer}                                         from './embedded.js';
+import {Result}                                         from './result.js';
+import {isTelegram, isTelegramMobile, openTelegramLink} from './telegram.js';
+
 import type {EthereumProviderRequest, PageMetadata, Session, SessionData, SmartSession, StavaxAccountConfig, SupportedPlatform} from './types.js';
 import {TgBotScreen}                                                                                                            from './types.js';
 import {randomString}                                                                                                           from './utils.js';
@@ -160,29 +163,39 @@ export class StavaxAccount {
         const that = this;
         return new Promise((resolve, reject) => {
             const connectors = getConnectors(this.getWagmiConfig());
+            let connector: Connector | undefined = undefined;
 
-            const walletConnectConnector = connectors.find(c => c.id === 'walletConnect');
-            if (!walletConnectConnector) {
-                reject(new Error('missing walletConnect connector'));
-                return;
-            }
-
-            async function onDisplayURI(payload: any) {
-                if (payload.type != 'display_uri') {
+            if (that.isInjected) {
+                connector = connectors.find(c => c.id === ProviderRDNS);
+                if (!connector) {
+                    reject(new Error('cannot find stavaxProvider connector.  Please check your Stavax Provider setup, make sure the setupStavaxProvider is called before createConfig from Wagmi.'));
                     return;
                 }
-                walletConnectConnector?.emitter.off('message', onDisplayURI);
-                const uri = payload.data as string;
-                if (!uri) {
-                    reject(new Error('cannot get wallet connect URI'));
+            } else {
+                connector = connectors.find(c => c.id === 'walletConnect');
+                if (!connector) {
+                    reject(new Error('missing walletConnect connector'));
                     return;
                 }
-                that.connect(uri).then(resolve).catch(reject);
+
+                async function onDisplayURI(payload: any) {
+                    if (payload.type != 'display_uri') {
+                        return;
+                    }
+                    connector?.emitter.off('message', onDisplayURI);
+                    const uri = payload.data as string;
+                    if (!uri) {
+                        reject(new Error('cannot get wallet connect URI'));
+                        return;
+                    }
+                    that.connect(uri).then(resolve).catch(reject);
+                }
+
+                connector.emitter.on('message', onDisplayURI);
             }
 
-            walletConnectConnector.emitter.on('message', onDisplayURI);
             connect(this.getWagmiConfig(), {
-                connector: walletConnectConnector,
+                connector: connector,
             }).then(data => {
                 onSuccess?.(data);
             }).catch(err => {
