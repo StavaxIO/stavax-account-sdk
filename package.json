@@ -1,6 +1,6 @@
 {
     "name": "@stavaxio/account-sdk",
-    "version": "0.16.0-rc.0",
+    "version": "0.16.0",
     "type": "module",
     "main": "./dist/account-sdk.js",
     "types": "./dist/index.d.ts",

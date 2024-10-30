@@ -16,7 +16,7 @@
 ## Installation
 
 ```
-npm i @stavaxio/account-sdk
+npm i @stavaxio/account-sdk @wagmi/core @wagmi/connectors viem
 ```
 
 ### Setup for Nuxt
@@ -47,15 +47,14 @@ To integrate Stavax Account with your dApp, you'll need a wagmiConfig instance t
 
 ```ts
 // wagmiConfig.ts
-import {createConfig, http, injected} from "@wagmi/core"
+import {createConfig, http} from "@wagmi/core"
 import {sei, seiTestnet} from "@wagmi/core/chains"
-import {walletConnectConnector} from "@stavaxio/account-sdk"
+import {walletConnect} from "@wagmi/connectors"
 
 export const wagmiConfig = createConfig({
     chains: [sei, seiTestnet],
     connectors: [
-        injected(),
-        walletConnectConnector({
+        walletConnect({
             projectId: 'your-wallet-connect-project-id',
             showQrModal: false,
             metadata: {
@@ -89,41 +88,49 @@ const stavaxAccount = new StavaxAccount({
 
 ### Using `wagmiConfig` with Wagmi Provider
 
-In addition to the Stavax Account SDK, you'll likely want to initialize the Wagmi provider in your application using the same wagmiConfig:
+In addition to the Stavax Account SDK, you'll likely want to initialize the Wagmi provider in your application using the **same wagmiConfig instance
+**:
+
+#### React
 
 ```tsx
 // App.tsx
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {WagmiProvider} from 'wagmi';
 import {wagmiConfig} from './wagmiConfig';
+
+const queryClient = new QueryClient()
 
 function App() {
     return (
         <WagmiProvider config={wagmiConfig}>
-            {/* Rest of your app components */}
+            <QueryClientProvider client={queryClient}>
+                {/* Rest of your app components */}
+            </QueryClientProvider>
         </WagmiProvider>
     );
 }
 
 export default App;
+```
 
+#### Nuxt
+
+```ts
+// plugins/wagmi.ts
+import {QueryClient, VueQueryPlugin} from '@tanstack/vue-query';
+import {walletConnect} from '@wagmi/connectors';
+import {WagmiPlugin} from '@wagmi/vue';
+import {wagmiConfig} from '../wagmiConfig';
+
+export default defineNuxtPlugin((app) => {
+    app.vueApp
+        .use(WagmiPlugin, {config: wagmiConfig})
+        .use(VueQueryPlugin, {queryClient: new QueryClient()});
+});
 ```
 
 ## Connect Stavax Account
-
-### Use Stavax Account as injected provider (beta)
-
-Stavax Account can be configured as injected provider
-
-```ts
-import {StavaxAccount} from "@stavaxio/account-sdk"
-import {setupStavaxProvider} from '@stavaxio/account-sdk/adapter/evm'
-
-const stavaxAccount = new StavaxAccount({
-    projectID: 'your-project-id',
-    wagmiConfig: wagmiConfig, // wagmiConfig with injected() connectors
-})
-setupStavaxProvider(stavaxAccount)
-```
 
 ### Use Stavax Account on top of Wallet Connect
 
@@ -170,7 +177,7 @@ To directly obtain the connect result from Wagmi, you can use `.wagmiConnect()`:
 const connectResult = await stavaxAccount.wagmiConnect() // wagmi ConnectReturnType
 ```
 
-### Send Transaction
+## Send Transaction
 
 Stavax Account SDK provides two methods built on top of wagmi functions for sending on-chain transactions.
 
@@ -205,7 +212,7 @@ The SDK has built-in error handling for transaction failures:
 
 Read more about [Pre-authorized Transaction](https://docs.stavax.io/product/stavax-account/pre-authorized-transaction)
 
-### Stavax Bot Interaction
+## Stavax Bot Interaction
 
 | Method                                 | Description                                                                                             |
 |----------------------------------------|:--------------------------------------------------------------------------------------------------------|
@@ -215,7 +222,7 @@ Read more about [Pre-authorized Transaction](https://docs.stavax.io/product/stav
 | `openTgBotScreen(screen: TgBotScreen)` | Opens a specific bot screen (e.g., deposit, withdrawal) based on `TgBotScreen` enum.                    |
 | `openTgBotWithSession(session)`        | Opens the bot with the active Stavax session, ensuring state continuity..                               |
 
-### Config
+## Config
 
 ```ts
 import {Config} from "@wagmi/core/src/createConfig";
@@ -249,5 +256,25 @@ interface StavaxAccountConfig {
     usingEmbeddedMode?: boolean;
 }
 ```
+
+## Use Stavax Account as injected provider (beta)
+
+Stavax Account can be configured as injected provider.
+
+Make sure to call setupStavaxProvider as soon as possible, since some libraries, like Wagmi, only detect injected providers when the config object is
+created.
+
+```ts
+import {StavaxAccount} from "@stavaxio/account-sdk"
+import {setupStavaxProvider} from '@stavaxio/account-sdk/adapter/evm'
+
+export const stavaxAccount = new StavaxAccount({
+    projectID: 'your-project-id',
+})
+setupStavaxProvider(stavaxAccount);
+```
+
+When your app run inside Stavax Browser, you will see the Stavax Account Injected connector with id `io.stavax.account`
+
 
 

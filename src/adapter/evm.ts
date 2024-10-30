@@ -129,16 +129,17 @@ const logo =
 
 function announceProvider(stavaxAccount: StavaxAccount, customProvider?: CustomProviderFn) {
     if (typeof window === 'undefined') return;
-    const provider: EthereumProvider = EthereumProvider.getInstance(stavaxAccount, customProvider);
-    if (stavaxAccount.isInjected) {
-        window.ethereum = provider;
+    if (!stavaxAccount.isInjected) {
+        return;
     }
+    const provider: EthereumProvider = EthereumProvider.getInstance(stavaxAccount, customProvider);
+    window.ethereum = provider;
 
     window?.dispatchEvent(
         new CustomEvent('eip6963:announceProvider', {
             detail: Object.freeze({
                 provider: provider,
-                info: {
+                info    : {
                     name: 'Stavax Account',
                     icon: logo,
                     rdns: 'io.stavax.account',
