@@ -88,8 +88,8 @@ const stavaxAccount = new StavaxAccount({
 
 ### Using `wagmiConfig` with Wagmi Provider
 
-In addition to the Stavax Account SDK, you'll likely want to initialize the Wagmi provider in your application using the **same wagmiConfig instance
-**:
+In addition to the Stavax Account SDK, you'll likely want to initialize the Wagmi provider in your application using the
+**same wagmiConfig instance**:
 
 #### React
 
