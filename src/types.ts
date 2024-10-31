@@ -67,6 +67,7 @@ export type SupportedPlatform = 'ethereum'
 
 export interface PageMetadata {
     projectID: string;
+    sdkDeviceID?: string;
     title: string;
     url: string;
     icon?: string | undefined | null;

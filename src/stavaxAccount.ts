@@ -482,10 +482,11 @@ export class StavaxAccount {
             icon = `${location.protocol}//${location.host}${icon}`;
         }
         return {
-            projectID: this.config.projectID,
-            icon     : icon,
-            title    : document.title,
-            url      : location.href,
+            projectID  : this.config.projectID,
+            sdkDeviceID: getSDKDeviceID(),
+            icon       : icon,
+            title      : document.title,
+            url        : location.href,
         };
     }
 }
