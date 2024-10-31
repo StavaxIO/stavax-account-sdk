@@ -276,7 +276,7 @@ export const stavaxAccount = new StavaxAccount({
 setupStavaxProvider(stavaxAccount);
 ```
 
-When your app run inside Stavax Browser, you will see the Stavax Account Injected connector with id `io.stavax.account`
+When your app runs inside the Stavax Browser, you will see the Stavax Account Injected connector with id `io.stavax.account`
 
 
 
