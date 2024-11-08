@@ -259,24 +259,51 @@ interface StavaxAccountConfig {
 }
 ```
 
-## Use Stavax Account as injected provider (beta)
+## Use Stavax Account as injected provider
 
-Stavax Account can be configured as injected provider.
+Stavax Account includes an in-app browser that can open a DApp directly within Stavax Account.
 
-Make sure to call setupStavaxProvider as soon as possible, since some libraries, like Wagmi, only detect injected providers when the config object is
-created.
+The Stavax Injected provider can be used to connect a DApp running inside the Stavax Browser to the Stavax Account Wallet.
+
+### Method 1: Use Stavax Injected provider only
 
 ```ts
 import {StavaxAccount} from "@stavaxio/account-sdk"
-import {setupStavaxProvider} from '@stavaxio/account-sdk/adapter/evm'
 
-export const stavaxAccount = new StavaxAccount({
-    projectID: 'your-project-id',
-})
-setupStavaxProvider(stavaxAccount);
+StavaxAccount.initInjectedProvider({projectID: 'your-project-id'});
 ```
 
-When your app runs inside the Stavax Browser, you will see the Stavax Account Injected connector with id `io.stavax.account`
+Make sure to call `StavaxAccount.initInjectedProvider` as soon as possible, since some libraries, like Wagmi,
+only detect injected providers when the config object is created.
 
+### Method 2: Use with StavaxAccount wallet connect
 
+In this mode, you must register the Stavax Injected Provider before create the wagmi config.
 
+```ts
+import {StavaxAccount} from "@stavaxio/account-sdk"
+import {setupEthereumProvider} from "@stavaxio/account-sdk/adapter/evm";
+import {createConfig} from "@wagmi/core"
+
+// Step 1: Create a Stavax Account instance
+export const stavaxAccount = new StavaxAccount({projectID: 'your-project-id'})
+// Step 2: Register the Stavax Injected provider
+stavaxAccount.initInjectedProvider();
+// Step 3: Create the wagmi config
+export const wagmiConfig = createConfig({
+    // ...
+})
+// Step 4: Assign the Wagmi config to Stavax
+stavaxAccount.setWagmiConfig(wagmiConfig)
+
+// Step 5: Use the Wagmi config as with a normal setup
+// ...
+```
+
+When your app runs inside the Stavax Browser, you will see the Stavax Injected connector with id `io.stavax.account`
+
+### Test your injected provider setup
+
+Open Stavax Account Mini App via this URL: https://t.me/stavax_account_bot/browser-test
+
+On the opened page, enter your URL and click **Go** to open in Stavax Browser.

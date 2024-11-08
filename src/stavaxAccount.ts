@@ -10,12 +10,12 @@ import {
     type SendTransactionParameters,
     type SendTransactionReturnType,
     type WriteContractParameters,
-}                                                       from '@wagmi/core';
-import {encodeFunctionData, type Hex, toHex}            from 'viem';
-import {ProviderRDNS}                                   from './adapter/evm.js';
-import {Drawer}                                         from './embedded.js';
-import {Result}                                         from './result.js';
-import {isTelegram, isTelegramMobile, openTelegramLink} from './telegram.js';
+}                                                              from '@wagmi/core';
+import {encodeFunctionData, type Hex, toHex}                   from 'viem';
+import {EthereumProvider, ProviderRDNS, setupEthereumProvider} from './adapter/evm.js';
+import {Drawer}                                                from './embedded.js';
+import {Result}                                                from './result.js';
+import {isTelegram, isTelegramMobile, openTelegramLink}        from './telegram.js';
 
 import type {EthereumProviderRequest, PageMetadata, Session, SessionData, SmartSession, StavaxAccountConfig, SupportedPlatform} from './types.js';
 import {TgBotScreen}                                                                                                            from './types.js';
@@ -432,6 +432,14 @@ export class StavaxAccount {
     getTgBotWebAppURL(session: Session): Result<string> {
         const command = encodeURIComponent(`sid=${session.id}`);
         return new Result(`${this.config.tgBotWebAppURL}?startapp=${command}`);
+    }
+
+    static initInjectedProvider(config: StavaxAccountConfig): EthereumProvider | undefined {
+        return new StavaxAccount(config).initInjectedProvider();
+    }
+
+    public initInjectedProvider() {
+        return setupEthereumProvider(this);
     }
 
     get isInjected() {
