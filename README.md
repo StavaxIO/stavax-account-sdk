@@ -304,6 +304,6 @@ When your app runs inside the Stavax Browser, you will see the Stavax Injected c
 
 ### Test your injected provider setup
 
-Open Stavax Account Mini App via this URL: https://t.me/stavax_account_bot/browser-test
+Open Stavax Account Mini App via this URL: https://t.me/stavax_account_bot/browser_test
 
 On the opened page, enter your URL and click **Go** to open in Stavax Browser.
