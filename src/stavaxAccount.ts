@@ -233,7 +233,7 @@ export class StavaxAccount {
         }
     }
 
-    private async findSmartSession(parameters: SendTransactionParameters): Promise<SmartSession | undefined> {
+    async findSmartSession(parameters: SendTransactionParameters): Promise<SmartSession | undefined> {
         try {
             const res = await this._fetch('/sdk-api/smart-wallets/sessions/find-session', {
                     method: 'POST',
