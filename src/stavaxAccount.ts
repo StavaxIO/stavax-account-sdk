@@ -392,7 +392,7 @@ export class StavaxAccount {
             return new Result(void 0);
         }
 
-        if (isTelegram() && this.config.usingEmbeddedMode) {
+        if (this.config.usingEmbeddedMode) {
             const drawer = Drawer.instance(this.config);
 
             drawer.openURL(this.getIframeURL(Telegram.WebApp.initData))
@@ -407,13 +407,23 @@ export class StavaxAccount {
             return new Result(void 0);
         }
 
-        if (force || (isTelegram() && (isTelegramMobile() || this.config.openTgBotOnDesktop))) {
-            const result = this.getTgBotWebAppURL(session);
-            if (result.error) {
-                return new Result(void 0, result.error);
+        if (force || isTelegram()) {
+            if (isTelegramMobile() || this.config.openTgBotOnDesktop) {
+                const result = this.getTgBotWebAppURL(session);
+                if (result.error) {
+                    return new Result(void 0, result.error);
+                }
+                openTelegramLink(result.value);
             }
-            openTelegramLink(result.value);
+            return new Result(void 0);
         }
+
+        // Non Telegram Environment
+        const result = this.getWebURL(session);
+        if (result.error) {
+            return new Result(void 0, result.error);
+        }
+        open(result.value, "_blank");
 
         return new Result(void 0);
     }
@@ -432,6 +442,17 @@ export class StavaxAccount {
     getTgBotWebAppURL(session: Session): Result<string> {
         const command = encodeURIComponent(`sid=${session.id}`);
         return new Result(`${this.config.tgBotWebAppURL}?startapp=${command}`);
+    }
+
+    /**
+     * Retrieves the URL for the Stavax Web based on the provided session.
+     *
+     * @param {Session} session - The session object.
+     * @return {Result<string>} A Result object containing the URL for the Stavax Web, or an error if the configuration is missing.
+     */
+    getWebURL(session: Session): Result<string> {
+        const command = encodeURIComponent(`sid=${session.id}`);
+        return new Result(`${this.config.webURL}?tgWebAppStartParam=${command}`);
     }
 
     static initInjectedProvider(config: StavaxAccountConfig): EthereumProvider | undefined {

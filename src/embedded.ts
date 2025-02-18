@@ -1,4 +1,5 @@
-import type {StavaxAccountConfig} from './types.js';
+import {telegramCheck} from './telegram.js';
+import type {StavaxAccountConfig}        from './types.js';
 
 export class Drawer {
     private static _instance: Drawer;
@@ -87,8 +88,10 @@ export class Drawer {
                 }
                 break;
             case 'tgWebAppNavigation':
-                // @ts-ignore
-                return Telegram.WebApp[method](...data.params);
+                return telegramCheck(() => {
+                     // @ts-ignore
+                    return Telegram.WebApp[method](...data.params);
+                }, void 0)
             case 'tgWebApp':
                 if (method == 'close') {
                     this.close();

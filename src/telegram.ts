@@ -1,4 +1,4 @@
-function telegramCheck<T>(cb: () => T, defaultValue: T): T {
+export function telegramCheck<T>(cb: () => T, defaultValue: T): T {
     if (typeof Telegram === 'undefined') {
         return defaultValue
     }

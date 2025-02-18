@@ -1,6 +1,6 @@
 {
     "name": "@stavaxio/account-sdk",
-    "version": "0.16.5",
+    "version": "0.17.0-dev.0",
     "type": "module",
     "license": "Apache-2.0",
     "repository": {
